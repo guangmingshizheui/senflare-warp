@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senflare Warp - 管理后台</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+    <!-- 字体：与 sf-admin.html 同源（jsDelivr 长缓存，media=print 不阻塞首帧） -->
+    <link id="fontInterCss" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5/index.css" media="print" onload="this.media='all'">
+    <link id="fontNotoCss" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/noto-sans-sc@5/index.css" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5/index.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/noto-sans-sc@5/index.css">
+    </noscript>
+    <!-- 动态主题色：与管理后台调色盘共用 localStorage['theme-color']，首帧前注入避免整页默认橙（同 index.html） -->
+    <script>
+    (function () {
+        var saved = '';
+        try { saved = localStorage.getItem('theme-color') || ''; } catch (e) {}
+        var m = /^#?([0-9a-fA-F]{6})$/.exec(saved);
+        if (!m) return;
+        var hex = '#' + m[1];
+        var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+        var rr = r / 255, gg = g / 255, bb = b / 255;
+        var max = Math.max(rr, gg, bb), min = Math.min(rr, gg, bb);
+        var h = 0, s = 0, l = (max + min) / 2;
+        if (max !== min) {
+            var d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            if (max === rr) h = (gg - bb) / d + (gg < bb ? 6 : 0);
+            else if (max === gg) h = (bb - rr) / d + 2;
+            else h = (rr - gg) / d + 4;
+            h *= 60;
+        }
+        var root = document.documentElement;
+        root.style.setProperty('--color-primary', hex);
+        root.style.setProperty('--color-primary-rgb', r + ', ' + g + ', ' + b);
+        root.style.setProperty('--color-primary-light', 'hsl(' + Math.round(h) + ', ' + Math.round(s * 100) + '%, ' + Math.min(Math.round(l * 100) + 15, 90) + '%)');
+        root.style.setProperty('--color-primary-dark', 'hsl(' + Math.round(h) + ', ' + Math.round(s * 100) + '%, ' + Math.max(Math.round(l * 100) - 6, 20) + '%)');
+    })();
+    </script>
+    <!-- 主题令牌 / .form-group label / .toast 复用后台同款样式表 -->
+    <link rel="stylesheet" href="css/SenflareUI.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <script src="js/api.js" defer></script>
+    <script src="js/login-ui.js" defer></script>
+    <script src="js/theme.js" defer></script>
+    <!-- 登录页样式说明见 css/login.css 头部 -->
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- 壁纸轮播层：首帧静态渲染第 1 张（桌面横版 / 移动竖版按断点二选一），其余由 js/login-ui.js 接管 -->
+        <div class="bg-slides" id="bgSlides" aria-hidden="true">
+            <div class="bg-slide active only-desktop" style="background-image:url('assets/images/wallpapers/banner-1.webp')"></div>
+            <div class="bg-slide active only-mobile" style="background-image:url('assets/images/wallpapers/banner-mobile-1.webp')"></div>
+        </div>
+        <!-- 左上角品牌标识 -->
+        <div class="brand-header">
+            <div class="brand-logo">
+                <img src="assets/images/favicon.svg" alt="Senflare Warp" width="40" height="40">
+            </div>
+            <div class="brand-text">
+                <h2>Senflare Warp</h2>
+                <p>二十一世纪，最快、最稳、最安全的网络加速服务</p>
+            </div>
+        </div>
+
+        <!-- 右侧登录区域（默认访客模式：访客密码进入，仅可查看 数据看板 / 节点订阅 / 关于我们；管理员点下方切换） -->
+        <div class="login-section">
+            <div class="login-box">
+                <h1 id="loginTitle">访客登录</h1>
+                <form id="loginForm">
+                    <div class="form-group" id="userGroup" style="display:none">
+                        <label for="username">账号</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 21C20 19.6044 20 18.9067 19.8278 18.3389C19.44 17.0605 18.4395 16.06 17.1611 15.6722C16.5933 15.5 15.8956 15.5 14.5 15.5H9.5C8.10444 15.5 7.40665 15.5 6.83886 15.6722C5.56045 16.06 4.56004 17.0605 4.17224 18.3389C4 18.9067 4 19.6044 4 21M16.5 7.5C16.5 9.98528 14.4853 12 12 12C9.51472 12 7.5 9.98528 7.5 7.5C7.5 5.01472 9.51472 3 12 3C14.4853 3 16.5 5.01472 16.5 7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <input type="text" id="username" placeholder="请输入管理员账号" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" id="pwdLabel">密码</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 14.5V16.5M7 10.0288C7.47142 10 8.05259 10 8.8 10H15.2C15.9474 10 16.5286 10 17 10.0288M7 10.0288C6.41168 10.0647 5.99429 10.1455 5.63803 10.327C5.07354 10.6146 4.6146 11.0735 4.32698 11.638C4 12.2798 4 13.1198 4 14.8V16.2C4 17.8802 4 18.7202 4.32698 19.362C4.6146 19.9265 5.07354 20.3854 5.63803 20.673C6.27976 21 7.11984 21 8.8 21H15.2C16.8802 21 17.7202 21 18.362 20.673C18.9265 20.3854 19.3854 19.9265 19.673 19.362C20 18.7202 20 17.8802 20 16.2V14.8C20 13.1198 20 12.2798 19.673 11.638C19.3854 11.0735 18.9265 10.0647 17 10.0288M7 10.0288V8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8V10.0288" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <input type="password" id="password" placeholder="请输入访客密码" required>
+                        </div>
+                    </div>
+                    <!-- 记住密码（管理员记住账号密码 / 访客记住访客密码，分开存储互不干扰） -->
+                    <div class="form-group remember-row" id="rememberRow">
+                        <label class="checkbox-label"><input type="checkbox" id="rememberPwd"><span class="checkmark"></span><span>记住密码</span></label>
+                    </div>
+                    <button type="submit" class="btn" id="adminLoginBtn">访客登录</button>
+                    <!-- 模式切换按钮：访客模式显示「管理员登录」，管理员模式显示「访客登录」 -->
+                    <div class="guest-divider" id="guestDivider"><span>或</span></div>
+                    <button type="button" class="btn btn-guest" id="guestBtn">管理员登录</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="toast" class="toast"></div>
+
+</body>
+</html>

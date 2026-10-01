@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Senflare Warp — 管理后台</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+  <!-- 字体：Inter + Noto Sans SC Variable（jsDelivr 长缓存，media=print 不阻塞首帧；失败自动切 gcore 备份，见 js/admin-ui.js） -->
+  <link id="fontInterCss" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5/index.css"
+    media="print" onload="this.media='all'">
+  <link id="fontNotoCss" rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@fontsource-variable/noto-sans-sc@5/index.css" media="print"
+    onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/noto-sans-sc@5/index.css">
+  </noscript>
+  <link rel="stylesheet" href="css/SenflareUI.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <!-- 登录鉴权：未登录直接跳 login -->
+  <script>(function () { try { var t = localStorage.getItem('sf_warp_token'); var lt = parseInt(localStorage.getItem('sf_warp_login_time') || '0', 10); if (!t || !lt || Date.now() - lt > 7 * 24 * 60 * 60 * 1000) location.replace('login.html'); } catch (e) { } })();</script>
+  <!-- 扫码：qrcodejs（二维码展示订阅链接） -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
+  <script src="js/api.js" defer></script>
+  <script src="js/admin.js" defer></script>
+  <script src="js/admin-ui.js" defer></script>
+  <script src="js/theme.js" defer></script>
+</head>
+
+<body>
+  <!-- 液态背景 -->
+  <div class="bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="app-body">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar expanded" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <!-- 品牌标识：与 assets/images/favicon.svg 同款；logo-grad 双 stop 供主题色切换钩子实时改色 -->
+          <svg width="24" height="24" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="logo-grad" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="var(--color-primary)" />
+                <stop offset="1" stop-color="var(--color-primary-dark)" />
+              </linearGradient>
+              <linearGradient id="logo-sheen" x1="0" y1="0" x2="0" y2="96" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#FFFFFF" stop-opacity=".32" />
+                <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <rect width="96" height="96" rx="22" fill="url(#logo-grad)" />
+            <rect width="96" height="96" rx="22" fill="url(#logo-sheen)" />
+            <!-- 云朵（白色，叠在渐变底上；与 favicon.svg 同款） -->
+            <path fill="#FFFFFF" transform="scale(0.09375)"
+              d="M597.333333 256c140.8 0 256 115.2 256 256s-115.2 256-256 256H341.333333c-93.866667 0-170.666667-76.8-170.666666-170.666667 0-85.333333 59.733333-153.6 140.8-166.4l38.4-8.533333 21.333333-34.133333C418.133333 307.2 503.466667 256 597.333333 256m0-85.333333c-128 0-238.933333 68.266667-298.666666 174.933333-119.466667 17.066667-213.333333 123.733333-213.333334 251.733333 0 140.8 115.2 256 256 256h256c187.733333 0 341.333333-153.6 341.333334-341.333333s-153.6-341.333333-341.333334-341.333333z" />
+          </svg>
+          <div class="logo-text"><span class="logo-senflare">Senflare</span><span class="logo-link">Warp</span></div>
+        </div>
+      </div>
+
+      <div class="nav-menu">
+        <!-- 数据看板 -->
+        <a class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard', this)" title="数据看板">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" />
+          </svg>
+          <span class="nav-text">数据看板</span>
+        </a>
+
+        <!-- 节点管理（ 五个子项提升为一级菜单 ） -->
+        <a class="nav-item" data-tab="nodes-speedtest" onclick="switchTab('nodes-speedtest', this)" title="在线优选">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span class="nav-text">在线优选</span>
+        </a>
+        <a class="nav-item" data-tab="nodes-config" onclick="switchTab('nodes-config', this)" title="节点配置">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path
+              d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+          </svg>
+          <span class="nav-text">节点配置</span>
+        </a>
+        <a class="nav-item" data-tab="nodes-subscription" onclick="switchTab('nodes-subscription', this)" title="节点订阅">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+          <span class="nav-text">节点订阅</span>
+        </a>
+        <a class="nav-item" data-tab="nodes-backend" onclick="switchTab('nodes-backend', this)" title="账号列表">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+          </svg>
+          <span class="nav-text">账号列表</span>
+        </a>
+
+        <!-- 安全设置 -->
+        <a class="nav-item" data-tab="security" onclick="switchTab('security', this)" title="安全设置">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <span class="nav-text">安全设置</span>
+        </a>
+
+        <!-- 系统日志 -->
+        <a class="nav-item" data-tab="logs" onclick="switchTab('logs', this)" title="系统日志">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+            <polyline points="13 2 13 9 20 9" />
+          </svg>
+          <span class="nav-text">系统日志</span>
+        </a>
+
+        <!-- 高级设置 -->
+        <a class="nav-item" data-tab="advanced" onclick="switchTab('advanced', this)" title="高级设置">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="4" y1="21" x2="4" y2="14" />
+            <line x1="4" y1="10" x2="4" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12" y2="3" />
+            <line x1="20" y1="21" x2="20" y2="16" />
+            <line x1="20" y1="12" x2="20" y2="3" />
+            <line x1="1" y1="14" x2="7" y2="14" />
+            <line x1="9" y1="8" x2="15" y2="8" />
+            <line x1="17" y1="16" x2="23" y2="16" />
+          </svg>
+          <span class="nav-text">高级设置</span>
+        </a>
+
+        <!-- 关于我们 -->
+        <a class="nav-item" data-tab="about" onclick="switchTab('about', this)" title="关于我们">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          <span class="nav-text">关于我们</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="footer-actions">
+          <div class="user-info" onclick="__logout()" title="管理员">
+            <div class="user-avatar" style="display:flex;width:22px;height:22px;font-size:0.7rem"><img
+                src="assets/images/icon.jpg" alt="管理员"
+                style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></div>
+            <div class="user-details">
+              <div class="user-name"><span id="sidebarUsername">管理员</span></div>
+            </div>
+          </div>
+          <div class="footer-right">
+            <div class="theme-toggle" onclick="toggleTheme()" title="切换主题"><span id="theme-icon"
+                class="theme-icon-slot"><svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg></span></div>
+            <div class="menu-toggle" onclick="toggleSidebar()" title="展开/收起">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-wrapper">
+      <div class="header">
+        <div class="header-left">
+          <div class="mobile-menu-btn" onclick="toggleSidebar()" title="菜单">☰</div>
+          <div class="mobile-brand">
+            <span class="logo-senflare">Senflare</span>
+            <span class="logo-link">Warp</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="header-icon-btn" onclick="openThemeModal()" title="主题设置">
+            <svg width="18" height="18" viewBox="0 0 512 512" fill="currentColor">
+              <path
+                d="m0 30v107c0 8.28 6.72 15 15 15h128c8.28 0 15-6.72 15-15v-107c0-16.54-13.46-30-30-30h-98c-16.54 0-30 13.46-30 30z" />
+              <path d="m0 257c0 8.28 6.72 15 15 15h128c8.28 0 15-6.72 15-15v-135h-158z" opacity="0.7" />
+              <path d="m0 242v112s29.95-.22 29.95 29.95v.05h113.05c8.28 0 15-6.72 15-15v-127z" opacity="0.5" />
+              <path
+                d="m211.315 44.858-53.5 92.665c-4.14 7.171-1.68 16.35 5.49 20.49l110.851 64c7.171 4.14 16.35 1.68 20.49-5.49l53.5-92.665c8.27-14.324 3.343-32.711-10.981-40.981l-84.87-49c-14.324-8.27-32.71-3.343-40.98 10.981z" />
+              <path
+                d="m97.815 241.446c-4.14 7.171-1.68 16.35 5.49 20.49l110.851 64c7.171 4.14 16.35 1.68 20.49-5.49l67.5-116.913-136.832-79z"
+                opacity="0.7" />
+              <path
+                d="m41.815 338.44c-4.14 7.171-1.68 16.35 5.49 20.49l110.851 64c7.171 4.14 16.35 1.68 20.49-5.49l63.5-109.985-136.832-79z"
+                opacity="0.5" />
+              <path
+                d="m387.007 163.45-92.665 53.5c-7.171 4.14-9.63 13.32-5.49 20.49l64 110.851c4.14 7.171 13.32 9.63 20.49 5.49l92.665-53.5c14.324-8.27 19.251-26.657 10.981-40.981l-49-84.87c-8.271-14.323-26.657-19.25-40.981-10.98z" />
+              <path
+                d="m190.419 276.95c-7.171 4.14-9.63 13.32-5.49 20.49l64 110.851c4.14 7.171 13.32 9.63 20.49 5.49l116.913-67.5-79-136.832z"
+                opacity="0.7" />
+              <path
+                d="m93.424 332.95c-7.171 4.14-9.63 13.32-5.49 20.49l64 110.851c4.14 7.171 13.32 9.63 20.49 5.49l109.985-63.5-79-136.832z"
+                opacity="0.5" />
+              <path
+                d="m482 354h-107c-8.28 0-15 6.72-15 15v128c0 8.28 6.72 15 15 15h107c16.54 0 30-13.46 30-30v-98c0-16.54-13.46-30-30-30z" />
+              <path d="m255 354c-8.28 0-15 6.72-15 15v128c0 8.28 6.72 15 15 15h135v-158z" opacity="0.7" />
+              <path d="m143 354c-8.28 0-15 6.72-15 15v128c0 8.28 6.72 15 15 15h127v-158z" opacity="0.5" />
+              <path d="m158 354h-158v143c0 8.284 6.716 15 15 15h143z" opacity="0.3" />
+            </svg>
+          </button>
+          <a class="header-icon-btn" href="https://t.me/Senflare" target="_blank" rel="noopener" title="Telegram">
+            <svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+            </svg>
+          </a>
+          <a class="header-icon-btn" href="https://github.com/Senflare" target="_blank" rel="noopener" title="GitHub">
+            <svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="container">
+
+          <!-- ========== 数据看板 ========== -->
+          <div id="view-dashboard">
+
+            <!-- 网络检测：国内/国外站点延迟 + 点击查出口 IP -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M2 12h20" />
+                      <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    </svg> 网络检测</h3>
+                </div>
+                <button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg width="16" height="16"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <div class="latency-cards" id="latency-cards"></div>
+              </div>
+            </div>
+
+            <!-- WARP 账号总览 -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
+                      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+                    </svg> 账号总览</h3>
+                </div>
+                <button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg width="16" height="16"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <div class="dash-stats" id="warpDashStats">
+                  <div class="dash-stat dash-stat-with-icon">
+                    <span class="dash-stat-icon-box"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" />
+                        <line x1="8" y1="21" x2="16" y2="21" />
+                        <line x1="12" y1="17" x2="12" y2="21" />
+                      </svg></span>
+                    <div>
+                      <div class="dash-stat-value" id="warpDashTotal">0</div>
+                      <div class="dash-stat-label">账号总数</div>
+                    </div>
+                  </div>
+                  <div class="dash-stat dash-stat-with-icon">
+                    <span class="dash-stat-icon-box"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 12.5l3 3 5-6" />
+                      </svg></span>
+                    <div>
+                      <div class="dash-stat-value ok" id="warpDashOk">0</div>
+                      <div class="dash-stat-label">正常</div>
+                    </div>
+                  </div>
+                  <div class="dash-stat dash-stat-with-icon">
+                    <span class="dash-stat-icon-box"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 8v4l2 2" />
+                      </svg></span>
+                    <div>
+                      <div class="dash-stat-value warn" id="warpDashWarn">0</div>
+                      <div class="dash-stat-label">待检查</div>
+                    </div>
+                  </div>
+                  <div class="dash-stat dash-stat-with-icon">
+                    <span class="dash-stat-icon-box"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M15 9l-6 6" />
+                        <path d="M9 9l6 6" />
+                      </svg></span>
+                    <div>
+                      <div class="dash-stat-value err" id="warpDashErr">0</div>
+                      <div class="dash-stat-label">异常</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 订阅活动 -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                  </svg> 订阅活动</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body" style="padding:0">
+                <div class="dash-stats" id="subDashStats"
+                  style="display:flex;gap:12px;padding:14px 16px;flex-wrap:wrap">
+                  <div class="dash-stat dash-stat-with-icon" style="flex:1;min-width:160px">
+                    <span class="dash-stat-icon-box"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                      </svg></span>
+                    <div>
+                      <div class="dash-stat-value ok" id="subDashToday">0</div>
+                      <div class="dash-stat-label">今日下发</div>
+                    </div>
+                  </div>
+                  <div class="dash-stat dash-stat-with-icon" style="flex:1;min-width:160px">
+                    <span class="dash-stat-icon-box" style="background:rgba(239,68,68,.1);color:#ef4444"><svg width="22"
+                        height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                      </svg></span>
+                    <div>
+                      <div class="dash-stat-value err" id="subDashReject">0</div>
+                      <div class="dash-stat-label">今日拒绝</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="sub-act-list" id="subDashList"
+                  style="display:flex;flex-direction:column;padding:0 18px 16px;gap:6px"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== 节点管理 ========== -->
+          <div id="view-nodes" style="display:none">
+            <!-- 子视图：在线优选 -->
+            <div class="nodes-subview st-view" data-sub="speedtest" style="display:none">
+              <!-- 卡2：测速结果面板 -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                    </svg>
+                    <span id="stTitleTxt">优选端点</span>
+                  </h3>
+                  <div class="dock-left">
+                    <span class="dock-stat">共 <b id="stCount">0</b> 个</span>
+                    <button class="dock-speed" title="开始测速" onclick="__stTest()">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"></path>
+                      </svg>
+                    </button>
+                    <button class="dock-speed" title="复制当前页" onclick="__stCopyPage()">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                    </button>
+                    <button class="dock-speed" title="下载当前页" onclick="__stDownloadPage()">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                    </button>
+                    <button class="dock-speed" id="stFoldBtn" title="折叠/展开结果列表" onclick="toggleStFold(this)"><svg
+                        width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="18 15 12 9 6 15"></polyline>
+                      </svg></button>
+                  </div>
+                </div>
+                <div class="card-body" style="padding:0">
+                  <!-- 数据来源（端点候选池） -->
+                  <div style="padding:12px 18px 2px">
+                    <div class="form-group" style="margin-bottom:10px">
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+                        <label style="margin:0">优选端点</label>
+                        <div style="display:flex;gap:8px;align-items:center">
+                          <select id="stSourceMode" class="form-control form-control-sm" style="width:auto"
+                            onchange="__stMode(this.value)">
+                            <option value="CUSTOM">自定义</option>
+                            <option value="SUBNET">网段优选</option>
+                          </select>
+                          <button type="button" class="btn btn-xs btn-outline" title="折叠/展开编辑器"
+                            onclick="__stEditorToggle()">↕</button>
+                        </div>
+                      </div>
+                      <div id="stEditorWrap">
+                        <textarea id="stSourceEditor" class="form-control" rows="6"
+                          placeholder="每行一个 Cloudflare 优选端点，如 162.159.197.60:443 或域名"></textarea>
+                      </div>
+                      <small class="hint">💡 测出优质端点后将写入订阅生成（替换账号默认端点）。支持每行一个地址或直链 URL</small>
+                    </div>
+                  </div>
+
+                  <!-- 结果小卡片网格 -->
+                  <div class="node-grid" id="st-speed"></div>
+
+                  <!-- 翻页 dock（内边距挂在 #stPager 上：分页隐藏时不在卡片底部留白） -->
+                  <div class="node-page-foot" style="padding:0 18px">
+                    <div class="pagination" id="stPager" style="padding-bottom:18px">
+                      <div class="pagination-row" id="stPagerRow"></div>
+                    </div>
+                  </div>
+
+                  <!-- 操作行：测速 / 设置（置于翻页 dock 下方；上下间距对称） -->
+                  <div
+                    style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 12px;border-top:1px solid var(--border-1)">
+                    <button class="btn btn-sm btn-primary" id="stTestBtn" onclick="__stTest()">开始测速</button>
+                    <button type="button" class="btn btn-sm btn-outline" onclick="__stCfgOpen()">测速设置</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 子视图：节点配置 -->
+            <div class="nodes-subview" data-sub="config" style="padding-bottom:8px">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                      <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg> 优选端点</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg></button>
+                </div>
+                <div class="card-body">
+                  <div class="form-group">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><label
+                        style="margin:0">优选端点</label>
+                      <select class="form-control form-control-sm" style="width:auto" data-cfg="MasqueIPMode"
+                        onchange="__masqueIPMode(this.value)">
+                        <option value="CUSTOM">自定义</option>
+                        <option value="LOCAL">在线优选</option>
+                        <option value="ACCOUNT">账号端点</option>
+                      </select>
+                    </div>
+                    <textarea class="form-control" rows="4" data-cfg="MasqueIP"
+                      placeholder="每行一个 MASQUE 优选端点（ IP:PORT#备注 ），或填入直链URL" style="display:none"></textarea>
+                    <textarea class="form-control" rows="4" data-cfg="LocalIP" placeholder="在线优选端点，每行一个 IP/域名，或填入直链URL"
+                      style="display:none;margin-top:8px"></textarea>
+                    <small class="hint">自定义 / 在线优选：轮询 IP 列表生成节点，一 IP 一节点（ × 传输形态数 ）；账号端点：按账号数生成，每账号出 v4/v6 端点（ × 端口模式 ×
+                      传输形态数 ）</small>
+                  </div>
+                  <div class="form-group"><label>端点模式</label><select class="form-control" data-cfg="MasqueEndpointMode">
+                      <option value="all">IPv4 + IPv6</option>
+                      <option value="v4">IPv4</option>
+                      <option value="v6">IPv6</option>
+                    </select></div>
+                  <div class="form-group"><label>端口模式</label><select class="form-control" data-cfg="MasquePortMode"
+                      data-custom-target="masquePortCustom">
+                      <option value="fixed">固定端口 [ 443 ]</option>
+                      <option value="random">随机端口 [ 443 / 500 / 1701 / 4500 / 4443 / 8443 / 8095 ]（ 推荐 ）</option>
+                      <option value="custom">自定义</option>
+                    </select></div>
+                </div>
+              </div>
+
+              <!-- MASQUE 配置 -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
+                      <path
+                        d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                    </svg> MASQUE 配置</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg></button>
+                </div>
+                <div class="card-body">
+                  <div class="form-group"><label>传输协议</label><select class="form-control" data-cfg="MasqueTransport"
+                      onchange="__masqueTransport(this.value)">
+                      <option value="h2">H2 [ 可优选 ]（ 推荐 ）</option>
+                      <option value="h3">H3 [ 更安全 ]</option>
+                      <option value="both">H2 + H3</option>
+                    </select><small class="hint">H2 走 TCP 可优选端点，H3 走 QUIC 仅可使用账号分配的 IP 端点，H2 + H3 每个端点各出一对节点</small>
+                  </div>
+                  <div class="form-group"><label>加速策略</label><select class="form-control" data-cfg="MasqueCc">
+                      <option value="bbr">性能模式 [ BBR ]（ 推荐 ）</option>
+                      <option value="cubic">均衡模式 [ CUBIC ]</option>
+                      <option value="reno">兼容模式 [ RENO ]</option>
+                    </select><small class="hint">拥塞控制算法，决定弱网下的传输效率与稳定性</small></div>
+                  <div class="form-group"><label>UDP 转发</label><select class="form-control" data-cfg="MasqueUdp">
+                      <option value="true">开启（ 推荐 ）</option>
+                      <option value="false">关闭</option>
+                    </select><small class="hint">是否转发隧道内 UDP 流量（ 游戏 / 语音 / QUIC 应用 ），H2/H3 均支持，建议保持开启</small></div>
+                  <div class="form-group"><label>DNS</label><select class="form-control" data-cfg="MasqueDns"
+                      data-custom-target="masqueDnsCustom">
+                      <option value="1.1.1.1, 8.8.8.8, 2606:4700:4700::1111, 2001:4860:4860::8888">Cloudflare + Google
+                        IPv4 + IPv6（ 推荐 ）</option>
+                      <option value="1.1.1.1, 8.8.8.8">Cloudflare + Google IPv4（ 推荐 ）</option>
+                      <option value="1.1.1.1">Cloudflare [ 1.1.1.1 ]</option>
+                      <option value="8.8.8.8">Google [ 8.8.8.8 ]</option>
+                      <option value="9.9.9.9">Quad9 [ 9.9.9.9 ]</option>
+                      <option value="custom">自定义</option>
+                    </select><small class="hint">节点内 DNS 解析列表，用于隧道内域名解析</small><input type="text" id="masqueDnsCustom"
+                      class="form-control" placeholder="1.1.1.1, 8.8.8.8" style="display:none;margin-top:8px"></div>
+                  <div class="form-group"><label>SNI</label><select class="form-control" data-cfg="MasqueSni"
+                      data-custom-target="masqueSniCustom">
+                      <option value="www.apple.com">苹果 [ www.apple.com ]（ 推荐 ）</option>
+                      <option value="www.microsoft.com">微软 [ www.microsoft.com ]</option>
+                      <option value="www.bing.com">必应 [ www.bing.com ]</option>
+                      <option value="www.lenovo.com">联想 [ www.lenovo.com ]</option>
+                      <option value="www.hp.com">惠普 [ www.hp.com ]</option>
+                      <option value="www.dell.com">戴尔 [ www.dell.com ]</option>
+                      <option value="www.samsung.com">三星 [ www.samsung.com ]</option>
+                      <option value="www.sony.com">索尼 [ www.sony.com ]</option>
+                      <option value="www.nvidia.com">英伟达 [ www.nvidia.com ]</option>
+                      <option value="www.amazon.com">亚马逊 [ www.amazon.com ]</option>
+                      <option value="www.oracle.com">甲骨文 [ www.oracle.com ]</option>
+                      <option value="custom">自定义</option>
+                    </select><small class="hint">TLS 握手时对外展示的域名。端点不校验 SNI，被过滤网络封堵时可换大厂域名（ 如 Apple / Microsoft
+                      ）</small><input type="text" id="masqueSniCustom" class="form-control"
+                      placeholder="www.example.com" style="display:none;margin-top:8px"></div>
+                </div>
+              </div>
+
+              <!-- 订阅配置 -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
+                      <circle cx="12" cy="12" r="3" />
+                      <path
+                        d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2" />
+                    </svg> 订阅配置</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg></button>
+                </div>
+                <div class="card-body">
+                  <div class="form-group"><label>订阅名称</label><input type="text" class="form-control" data-cfg="SubName"
+                      placeholder="Senflare Warp"></div>
+                  <div class="form-group"><label>订阅路径</label><input type="text" class="form-control" data-cfg="SubPath"
+                      placeholder="/links"></div>
+                  <div class="form-group"><label>订阅密钥</label><input type="text" class="form-control" data-cfg="SubKey"
+                      placeholder="留空禁用"><small class="hint">唯一订阅凭证，路径 /{SubPath}/<密钥> 即可获取订阅</small></div>
+                  <div class="form-group"><label>订阅规则</label><select class="form-control" data-cfg="SubConfig"
+                      data-custom-target="subConfigCustom">
+                      <option
+                        value="https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/config/ACL4SSR_Online_Mini_NoAuto.ini">
+                        [ 精简版 ] 无自动测速</option>
+                      <option
+                        value="https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/config/ACL4SSR_Online_Mini_AdblockPlus.ini">
+                        [ 精简版 ] 更多去广告</option>
+                      <option
+                        value="https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/config/ACL4SSR_Online_Mini_Fallback.ini">
+                        [ 精简版 ] 带故障转移</option>
+                      <option
+                        value="https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/config/ACL4SSR_Online_NoAuto.ini">
+                        [ 全分组 ] 无自动测速</option>
+                      <option
+                        value="https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/refs/heads/master/Clash/config/ACL4SSR_Online_NoReject.ini">
+                        [ 全分组 ] 无广告拦截</option>
+                      <option value="custom">自定义</option>
+                    </select><input type="text" id="subConfigCustom" class="form-control"
+                      placeholder="https://raw.githubusercontent.com/…/config.ini" style="display:none;margin-top:8px">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 子视图：节点订阅 -->
+            <div class="nodes-subview" data-sub="subscription" style="display:none">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                    </svg> 我的订阅</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg></button>
+                </div>
+                <div class="card-body">
+                  <div class="form-group">
+                    <label>选择订阅格式</label>
+                    <div class="sub-format-group">
+                      <button class="btn btn-outline" data-fmt="auto" onclick="generateSub('auto')">自适应</button>
+                      <button class="btn btn-outline" data-fmt="clash" onclick="generateSub('clash')">Clash</button>
+                      <button class="btn btn-outline" data-fmt="singbox"
+                        onclick="generateSub('singbox')">Singbox</button>
+                      <button class="btn btn-outline" data-fmt="b64" onclick="generateSub('b64')">Shadowrocket</button>
+                    </div>
+                  </div>
+                  <div class="form-group" id="sub-result-group" style="display:none">
+                    <label>生成结果</label>
+                    <div class="sub-result-container">
+                      <input type="text" class="form-control" id="generated-sub-url" readonly>
+                      <button onclick="copySubUrl()" class="btn btn-primary">复制</button>
+                      <button onclick="toggleSubQR()" class="btn btn-outline">扫码</button>
+                    </div>
+                    <div id="qrcode-container" class="qrcode-container"></div>
+                  </div>
+                  <div class="hint-box">
+                    <p>💡 提示：如果您的客户端没有对应按钮，请使用「自适应」格式，系统会自动识别您的客户端类型。</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                    </svg> 使用说明</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg></button>
+                </div>
+                <div class="card-body">
+                  <div class="guide-steps">
+                    <div class="guide-step">
+                      <div class="guide-step-number">1</div>
+                      <div class="guide-step-content">
+                        <div class="guide-step-title">选择订阅格式</div>
+                        <div class="guide-step-desc">根据你的代理客户端选择对应的订阅格式</div>
+                      </div>
+                    </div>
+                    <div class="guide-step-line"></div>
+                    <div class="guide-step">
+                      <div class="guide-step-number">2</div>
+                      <div class="guide-step-content">
+                        <div class="guide-step-title">复制订阅链接</div>
+                        <div class="guide-step-desc">点击复制按钮获取订阅链接，或扫码</div>
+                      </div>
+                    </div>
+                    <div class="guide-step-line"></div>
+                    <div class="guide-step">
+                      <div class="guide-step-number">3</div>
+                      <div class="guide-step-content">
+                        <div class="guide-step-title">导入代理客户端</div>
+                        <div class="guide-step-desc">在 Clash Meta、sing-box、Shadowrocket 等支持 MASQUE 的客户端中添加订阅</div>
+                      </div>
+                    </div>
+                    <div class="guide-step-line"></div>
+                    <div class="guide-step">
+                      <div class="guide-step-number">4</div>
+                      <div class="guide-step-content">
+                        <div class="guide-step-title">选择节点连接</div>
+                        <div class="guide-step-desc">更新订阅后选择合适的节点开始使用</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="guide-clients">
+                    <div class="guide-clients-title">支持客户端</div>
+                    <div class="guide-clients-list">
+                      <span class="guide-client-tag">Clash Verge Rev</span>
+                      <span class="guide-client-tag">Clash Verge</span>
+                      <span class="guide-client-tag">FlClash</span>
+                      <span class="guide-client-tag">ClashParty</span>
+                      <span class="guide-client-tag">ClashX</span>
+                      <span class="guide-client-tag">Clash Meta for Android</span>
+                      <span class="guide-client-tag">Bettbox</span>
+                      <span class="guide-client-tag">sing-box</span>
+                      <span class="guide-client-tag">Hiddify</span>
+                      <span class="guide-client-tag">Karing</span>
+                      <span class="guide-client-tag">Shadowrocket</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 子视图：账号列表 -->
+            <div class="nodes-subview" data-sub="backend" style="display:none">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
+                      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+                    </svg> 账号列表</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg></button>
+                </div>
+                <div class="card-body" style="padding:0">
+                  <!-- 账号卡片容器 -->
+                  <div class="cf-accounts-grid" id="cfAccountsGrid" style="padding:20px"></div>
+                  <!-- 底部操作栏 -->
+                  <div id="cfActionBar"
+                    style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:15px;border-top:1px solid var(--border-1);justify-content:space-between">
+                    <div style="display:flex;gap:10px">
+                      <button class="btn btn-primary btn-sm" onclick="__warpAddOpen()">添加账号</button>
+                      <input type="file" id="warpImportFile" accept=".json,application/json" style="display:none"
+                        onchange="__warpImportChange(this)">
+                    </div>
+                    <div style="display:flex;gap:15px;align-items:center">
+                      <span class="text-muted text-sm">已选择 <span class="text-primary" id="cfSelectedCount">0</span>
+                        项</span>
+                      <div class="dropdown" style="display:flex;align-items:center">
+                        <span class="dropdown-toggle cursor-pointer text-primary text-sm"
+                          onclick="toggleCFBatchDropdown(event)">▲ 批量操作</span>
+                        <div class="dropdown-menu dropdown-up" id="cfBatchDropdownMenu">
+                          <div class="dropdown-item text-danger" onclick="batchCFDelete()"><svg width="14" height="14"
+                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                              stroke-linecap="round" stroke-linejoin="round"
+                              style="display:inline-block;vertical-align:middle;margin-right:4px">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path
+                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg> 删除</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="alert alert-warning text-sm" style="margin-top:0"><svg width="14" height="14"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M9 18h6" />
+                  <path d="M10 22h4" />
+                  <path
+                    d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" />
+                </svg> 显示注册生成的 WARP MASQUE 账号，每个账号的端点将自动作为订阅节点的 Host 轮询填充。</div>
+            </div>
+          </div>
+
+          <!-- ========== 安全设置 ========== -->
+          <div id="view-security" style="display:none">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg> 管理员账号</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <div class="form-group"><label>后台管理账号</label><input type="text" id="secUser" class="form-control"
+                    placeholder="—" autocomplete="username"></div>
+                <div class="form-group"><label>后台管理密码<small class="hint"
+                      style="display:inline;margin-left:6px">（留空则不修改）</small></label><input type="password" id="secPass"
+                    class="form-control" placeholder="••••••••" autocomplete="new-password"></div>
+                <button class="btn btn-primary" onclick="__secSaveAccount()">保存账号</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg> 访客登录</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <div class="setting-item">
+                  <div class="setting-info"><span class="setting-label">开启访客登录</span><span
+                      class="setting-desc">登录页展示「访客登录」入口，访客输入访客密码进入后面板仅可查看 数据看板 / 节点订阅 / 关于我们，无法查看与修改任何配置、账号与日志。</span>
+                  </div><label class="switch"><input type="checkbox" id="guestEnabled" checked><span
+                      class="slider"></span></label>
+                </div>
+                <div class="form-group"><label>访客密码<small class="hint"
+                      style="display:inline;margin-left:6px">（留空则不修改）</small></label><input type="password"
+                    id="guestPass" class="form-control" placeholder="••••••••" autocomplete="new-password"></div>
+                <button class="btn btn-primary" onclick="__secSaveGuest()">保存设置</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5">
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg> 登录安全</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <div class="setting-item">
+                  <div class="setting-info"><span class="setting-label">登录失败锁定</span><span class="setting-desc">连续登录失败 5
+                      次后锁定来源 IP 10 分钟。</span></div><label class="switch"><input type="checkbox" id="secLock"
+                      checked><span class="slider"></span></label>
+                </div>
+                <div class="form-group"><label>会话超时时间（ 小时 ）</label><input type="number" id="secSession"
+                    class="form-control" value="24" min="1" max="168"><span class="hint">登录后多久自动退出，范围 1-168
+                    小时，保存后下次登录生效。</span></div>
+                <button class="btn btn-primary" onclick="__secSaveSecurity()">保存设置</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========== 系统日志 ========== -->
+          <div id="view-logs" style="display:none">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                    <polyline points="10 9 9 9 8 9" />
+                  </svg> 操作日志</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body" style="padding:0;overflow:visible">
+                <div class="table-no-top-border" style="overflow-x:auto;margin-top:-1px">
+                  <table class="node-table">
+                    <thead>
+                      <tr>
+                        <th>序号</th>
+                        <th>时间 (UTC+8)</th>
+                        <th>IP</th>
+                        <th>地区</th>
+                        <th>机房</th>
+                        <th>详情</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="logsBody">
+                      <tr>
+                        <td colspan="7" style="text-align:center" class="text-muted-light">暂无日志</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- 翻页 dock（内边距挂在 #logsPager 上：分页隐藏时不在卡片底部留白） -->
+                <div class="node-page-foot" style="padding:18px 18px 0">
+                  <div class="pagination" id="logsPager" style="padding-bottom:18px">
+                    <div class="pagination-row" id="logsPagerRow"></div>
+                  </div>
+                </div>
+
+                <!-- 操作行：刷新日志（置于翻页 dock 下方，与在线优选卡片一致） -->
+                <div
+                  style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 12px;border-top:1px solid var(--border-1)">
+                  <button class="btn btn-sm btn-primary" onclick="__logsRefresh()">刷新日志</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== 高级设置 ========== -->
+          <div id="view-advanced" style="display:none">
+            <!-- 系统状态栏 -->
+            <div class="system-status-bar">
+              <div class="status-bar-left">
+                <span class="status-bar-indicator" id="sys-d1-dot"></span>
+                <span class="status-bar-title">系统状态</span>
+              </div>
+              <div class="status-bar-items">
+                <div class="status-bar-item">
+                  <span class="status-bar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                      <line x1="7" y1="7" x2="7.01" y2="7" />
+                    </svg></span>
+                  <span class="status-bar-label">版本</span>
+                  <span class="status-bar-value" id="sys-version">v4.0.0-rc</span>
+                </div>
+                <div class="status-bar-divider"></div>
+                <div class="status-bar-item">
+                  <span class="status-bar-icon">💾</span>
+                  <span class="status-bar-label">数据库</span>
+                  <span class="status-bar-value" id="sys-db-status">未绑定 D1</span>
+                </div>
+                <div class="status-bar-divider"></div>
+                <div class="status-bar-item">
+                  <span class="status-bar-icon">🕐</span>
+                  <span class="status-bar-label">登录时间</span>
+                  <span class="status-bar-value" id="sys-session">-</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 首页伪装（ 自节点配置「运行开关」移入，独立卡片 ） -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg> 首页伪装</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <div class="setting-item">
+                  <div class="setting-info"><span class="setting-label">首页伪装</span><span class="setting-desc">开启后主后端域名的非
+                      API/订阅请求反代到下方目标 URL（节点域名伪装常开，不受此开关影响）。</span></div><label class="switch"><input type="checkbox"
+                      data-cfg="FakePage"><span class="slider"></span></label>
+                </div>
+                <div class="form-group"><label>伪装目标 URL</label><input type="text" class="form-control"
+                    data-cfg="FakeUrl" placeholder="https://yanhua.w3h5.com/"></div>
+              </div>
+            </div>
+
+            <!-- 全站主题（站主默认主题色：本地优先，服务端仅作首次访问默认） -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                      d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2" />
+                  </svg> 全站主题</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <div class="setting-item">
+                  <div class="setting-info"><span class="setting-label">主题颜色</span><span
+                      class="setting-desc">设置网站默认主题色，访客首次访问跟随该主题，访客可在落地页自行修改本地主题。</span></div>
+                  <div class="setting-theme-color"><button class="color-dot" onclick="openThemeModal('global')"
+                      title="选择全站主题色"><span id="themeColorDot" style="background:#1677ff"></span></button></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 登录页随机壁纸 -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg> 登录壁纸</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <div class="setting-item">
+                  <div class="setting-info"><span class="setting-label">壁纸来源</span><span
+                      class="setting-desc">选择随机壁纸接口，用于登录页背景，「自定义」可填任意图片 API 或静态图直链，保存后生效。</span></div>
+                  <div class="setting-select"><select id="bgSourceSel" data-cfg="BgSource"
+                      onchange="__bgSourceApply(this)">
+                      <option value="builtin">源站壁纸</option>
+                      <option value="elaina">Elaina API</option>
+                      <option value="yeqing">夜轻 API</option>
+                      <option value="uapis">Uapis API</option>
+                      <option value="custom">自定义</option>
+                    </select></div>
+                </div>
+                <div class="form-group" id="bgCustomWrap" style="display:none"><label>自定义图片地址</label><input type="text"
+                    class="form-control" id="bgCustomUrl" data-cfg="BgCustomUrl"
+                    placeholder="https://senflare.com/senflare.jpg 或 API 地址" onchange="__bgSourceApply(this)"></div>
+                <button type="button" class="btn btn-primary" onclick="__bgSourceSave()"
+                  style="margin-top:4px">保存设置</button>
+              </div>
+            </div>
+
+            <!-- 缓存设置 -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                      d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2" />
+                  </svg> 缓存设置</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <div class="setting-item">
+                  <div class="setting-info"><span class="setting-label">配置缓存</span><span class="setting-desc">开启后全部配置缓存
+                      5 分钟，减少重复读取，关闭后全部实时拉取，数据实时生效。</span></div><label class="switch"><input type="checkbox" checked
+                      data-cfg="Cache"><span class="slider"></span></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 全局配置 -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                    <polyline points="17 21 17 13 7 13 7 21" />
+                    <polyline points="7 3 7 8 15 8" />
+                  </svg> 全局配置</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <p class="desc" style="margin-bottom:15px">导出全局配置以备份，或从 JSON 文件导入全局配置，导入将覆盖现有配置。</p>
+                <div class="config-actions">
+                  <button onclick="__cfgExport()" class="btn btn-primary">导出配置</button>
+                  <button onclick="__cfgImport()" class="btn btn-outline">导入配置</button>
+                  <input type="file" id="cfgImportFile" accept=".json,application/json" style="display:none"
+                    onchange="__cfgImportChange(this)">
+                </div>
+              </div>
+            </div>
+
+            <!-- 危险区域 -->
+            <div class="card card-danger">
+              <div class="card-header">
+                <h3 class="card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg> 危险区域</h3><button class="card-toggle-btn" onclick="toggleCard(this)" title="折叠/展开"><svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg></button>
+              </div>
+              <div class="card-body">
+                <p class="desc" style="margin-bottom:15px">恢复出厂设置将清除面板所有设置（ 恢复为内置默认值 ），此操作不可恢复！</p>
+                <button onclick="__factoryReset()" class="btn btn-danger">恢复出厂设置</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== 关于我们 ========== -->
+          <div id="view-about" style="display:none">
+
+            <!-- 项目介绍 -->
+            <div class="card">
+              <div class="card-body">
+                <h3 class="about-h2">项目介绍<span class="en">PROJECT</span></h3>
+                <div class="about-hr"></div>
+                <p class="desc" style="line-height:1.85;margin-bottom:12px"><span class="grad-text">Senflare Warp</span>
+                  是 <strong style="color:var(--text-1)">基于 Cloudflare WARP 的 MASQUE 自建节点方案</strong> —— 在 Cloudflare
+                  <strong style="color:var(--text-1)">Workers + D1</strong> 免费额度内自建 WARP 账号池，一键注册、多账号管理、订阅分发，无需自备服务器。
+                </p>
+                <ul class="about-feats">
+                  <li><b>MASQUE</b> —— H2（HTTP/2 over TCP，可优选、抗过滤）+ H3（HTTP/3 over QUIC）双形态直连，IPv4/IPv6 端点全兼容。</li>
+                  <li><b>一键注册</b> —— 面板内直接注册 WARP MASQUE 账号，自动生成标准 SEC1 密钥并入库，开箱即用。</li>
+                  <li><b>端点优选</b> —— 浏览器实测 Cloudflare 端点延迟与连通，优质端点一键写入订阅。</li>
+                  <li><b>多端订阅</b> —— 一套链接按客户端自动分发 masque://（Shadowrocket）/ Clash YAML / sing-box JSON，多格式开箱即用。</li>
+                  <li><b>更多功能</b> —— 自己探索，懒得打字。</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- 友情链接 -->
+            <div class="card">
+              <div class="card-body">
+                <h3 class="about-h2">友情链接<span class="en">LINKS</span></h3>
+                <div class="about-hr"></div>
+                <div class="about-links">
+                  <a href="https://saas.seeck.cn/" target="_blank" rel="noopener">
+                    <span class="about-links-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="2" y1="12" x2="22" y2="12" />
+                        <path
+                          d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                      </svg></span>
+                    <span class="about-links-txt">
+                      <span class="about-links-name">Senflare SAAS</span>
+                      <span class="about-links-desc">SaaS 优选 —— Senflare SaaS 是一个专注于 Cloudflare
+                        优选服务的项目，致力于为用户提供最优质的网络加速体验。</span>
+                    </span>
+                    <svg class="arr" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M7 17L17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                  </a>
+                  <a href="https://proxy.seeck.cn/" target="_blank" rel="noopener">
+                    <span class="about-links-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                      </svg></span>
+                    <span class="about-links-txt">
+                      <span class="about-links-name">Senflare Proxy</span>
+                      <span class="about-links-desc">多源反代节点筛选面板 —— 汇聚多个 IP 数据源，提供地区筛选、反代节点浏览、反代域名、FOFA
+                        等平台反代检索、一键查询等功能。</span>
+                    </span>
+                    <svg class="arr" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M7 17L17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 项目声明 -->
+            <div class="card">
+              <div class="card-body">
+                <h3 class="about-h2">项目声明<span class="en">STATEMENT</span></h3>
+                <div class="about-hr"></div>
+                <ul class="about-declare">
+                  <li><b>公益性质</b> —— 本项目完全免费，仅限个人学习交流与技术研究使用，禁止任何形式的商业用途。</li>
+                  <li><b>合规使用</b> —— 使用前请了解并遵守所在地区法律法规，一切因使用本项目而直接或间接产生的后果由使用者自行承担。</li>
+                  <li><b>二创要求</b> —— 允许二次创作，但须保留上游鸣谢链接及本声明，并同样遵循非商业原则。</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 节点配置：悬浮操作按钮（ 仅配置子视图显示；保存 / 恢复默认 ） -->
+  <div class="cfg-fab" id="cfgFab">
+    <button type="button" class="fab-save" onclick="__saveCfg()" title="保存所有配置">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+        <polyline points="17 21 17 13 7 13 7 21" />
+        <polyline points="7 3 7 8 15 8" />
+      </svg>
+    </button>
+    <button type="button" class="fab-reset" onclick="__resetCfgDraft()" title="恢复默认配置">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="1 4 1 10 7 10" />
+        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+      </svg>
+    </button>
+  </div>
+
+  <div id="toast" class="toast">操作成功</div>
+
+  <!-- 测速设置弹窗（保存至浏览器本地存储） -->
+  <div class="modal" id="stCfgModal">
+    <div class="modal-content" style="max-width:420px" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>测速设置</h3><button class="modal-close" onclick="__stCfgClose()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom:1.2rem">
+          <label style="margin-bottom:8px;display:block">测速端口</label>
+          <select id="stCfgPort" class="form-control">
+            <option value="443">443</option>
+            <option value="8443">8443</option>
+            <option value="2053">2053</option>
+            <option value="2083">2083</option>
+            <option value="2087">2087</option>
+            <option value="2095">2095</option>
+            <option value="2096">2096</option>
+            <option value="random">随机</option>
+          </select>
+          <small class="text-muted" style="margin-top:6px;display:block">指定 HTTPS 端口探测，或选「随机」自动挑选</small>
+        </div>
+        <div class="form-group" style="margin-bottom:1.2rem">
+          <label style="margin-bottom:8px;display:block">并发线程数</label>
+          <input type="number" id="stCfgThreads" class="form-control" value="5" min="1" max="50">
+          <small class="text-muted" style="margin-top:6px;display:block">同时测速的 IP 数量，建议 5-20</small>
+        </div>
+        <div class="form-group" id="stCfgSubnetWrap" style="display:none;margin-bottom:1.2rem">
+          <label style="margin-bottom:8px;display:block">每个网段随机 IP 数量</label>
+          <input type="number" id="stCfgRandom" class="form-control" value="3" min="1" max="20">
+          <small class="text-muted" style="margin-top:6px;display:block">从每个网段中随机选择的 IP 数量（仅网段优选模式）</small>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label style="margin-bottom:8px;display:block">最大测速数量</label>
+          <input type="number" id="stCfgMax" class="form-control" value="20" min="1">
+          <small class="text-muted" style="margin-top:6px;display:block">单次测速最多测试的地址数量，超出部分截断</small>
+        </div>
+        <div class="form-group" style="margin-bottom:0;margin-top:1.2rem">
+          <label style="margin-bottom:8px;display:block">结果保存数量</label>
+          <input type="number" id="stCfgSave" class="form-control" value="10" min="1">
+          <small class="text-muted" style="margin-top:6px;display:block">测速完成后写入「节点配置」在线优选的最优地址个数</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="__stCfgClose()">取消</button>
+        <button class="btn btn-primary" onclick="__stCfgSave()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 节点详情弹窗（在线优选卡片点击查看测速明细） -->
+  <div class="st-check-modal" id="stCheckModal">
+    <div class="st-check-backdrop" onclick="__stDetailClose()"></div>
+    <div class="st-check-box">
+      <div class="st-check-head"><span>节点详情</span><button type="button" class="st-check-close"
+          onclick="__stDetailClose()" title="关闭"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg></button></div>
+      <div class="st-check-body" id="stCheckBody"></div>
+      <div class="st-check-actions">
+        <button type="button" class="st-detail-copy" onclick="__stDetailCopy()">复制</button>
+        <button type="button" class="st-detail-close" onclick="__stDetailClose()">关闭</button>
+      </div>
+    </div>
+  </div>
+  <!-- 通用确认弹窗（复用详情弹窗样式；底部按钮区对齐「开始测速/测速设置」的操作行样式） -->
+  <div class="st-check-modal" id="confirmModal">
+    <div class="st-check-backdrop" onclick="__confirmCancel()"></div>
+    <div class="st-check-box" style="width:min(400px,92vw)">
+      <div class="st-check-head"><span id="confirmTitle">确认</span></div>
+      <div class="st-check-body" id="confirmBody"></div>
+      <div class="st-check-actions">
+        <button type="button" class="btn btn-sm btn-outline st-confirm-cancel" onclick="__confirmDiscard()">取消</button>
+        <button type="button" class="btn btn-sm btn-primary st-confirm-ok" onclick="__confirmOk()">确定</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

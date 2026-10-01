@@ -1,0 +1,351 @@
+/* ==================== Admin 页面专属样式（改动后同步 bump HTML 引用的 ?v=）==================== */
+
+/* 数据看板：WARP 账号总览 stat tile + 订阅活动统计 */
+    .dash-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+    .dash-stat {
+      background: var(--card-bg, rgba(255,255,255,.6)); border: 1px solid var(--border-1, rgba(0,0,0,.05));
+      border-radius: 12px; padding: 16px 14px; text-align: center;
+    }
+    /* 图标版统计卡：图标居左（圆角背景），数字+标签居左对齐（横向布局，整卡高度与图标块对齐） */
+    .dash-stat-with-icon {
+      display: flex; align-items: center; gap: 12px; text-align: left; padding: 14px 16px;
+      min-height: 44px;
+    }
+    .dash-stat-icon-box {
+      flex-shrink: 0; width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--color-primary-bg-10, rgba(22,119,255,.1)); color: var(--color-primary, #1677ff);
+    }
+    .dash-stat-with-icon .dash-stat-value { font-size: 1.1rem; }
+    .dash-stat-with-icon .dash-stat-label { margin-top: 2px; }
+    .dash-stat-value { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
+    .dash-stat-value.ok { color: var(--color-success, #22c55e); }
+    .dash-stat-value.warn { color: var(--color-warning, #f59e0b); }
+    .dash-stat-value.err { color: var(--color-danger, #ef4444); }
+    .dash-stat-label { font-size: .82rem; color: var(--text-3, #666); margin-top: 4px; }
+    .dash-sub-stats { font-size: .88rem; color: var(--text-2, #444); }
+    .dash-sub-stats .sub-stat b { color: var(--color-primary, #1677ff); }
+    /* 订阅活动时间线：左侧状态色条 + 时间 / 类型徽标 / 详情 */
+    .sub-act-item { display: flex; align-items: center; gap: 10px; font-size: .85rem; padding: 6px 0 6px 12px; border-bottom: 1px dashed var(--border-1, rgba(0,0,0,.05)); position: relative; }
+    .sub-act-item:last-child { border-bottom: none; }
+    .sub-act-item::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 16px; border-radius: 2px; background: var(--color-success, #22c55e); }
+    .sub-act-item.err::before { background: var(--color-danger, #ef4444); }
+    .sub-act-time { color: var(--text-3, #666); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+    .sub-badge {
+      display: inline-block; padding: 1px 8px; border-radius: 20px; font-size: .75rem; flex-shrink: 0;
+      background: var(--color-primary-bg-10, rgba(22,119,255,.1)); color: var(--color-primary, #1677ff);
+    }
+    .sub-badge.err { background: rgba(239,68,68,.1); color: var(--color-danger, #ef4444); }
+    .sub-act-detail { color: var(--text-2, #444); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sub-act-detail.err { color: var(--color-danger, #ef4444); }
+
+/* 在线优选 dock：主题色样式（ 覆盖前台固定橙 --custom-primary-background / --primary-color ） */
+    .st-view .src-btn:hover { color: var(--color-primary); background: var(--color-primary-bg-10); }
+    .st-view .src-btn.active {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      color: #fff;
+      box-shadow: 0 2px 8px var(--color-primary-shadow);
+    }
+    /* 卡片头部内边距统一 */
+    .card-header { padding: 12px 18px; }
+    /* 所有卡片标题统一主题渐变；svg 图标单独恢复主题色（ 防 color:transparent 连带图标透明 ） */
+    .card-title {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+    }
+    .card-title svg { color: var(--color-primary); flex-shrink: 0; }
+    /* 危险区域卡片标题：红色（ 覆盖全局主题渐变标题 ） */
+    .card-danger .card-title { background: none; color: var(--color-danger); -webkit-text-fill-color: currentColor; }
+    .card-danger .card-title svg { color: var(--color-danger); stroke: var(--color-danger); }
+    /* 节点配置：悬浮操作按钮（ 保存 / 恢复默认，仅配置子视图显示；有未保存修改时禁止切页 ） */
+    .cfg-fab { position: fixed; right: 24px; bottom: 24px; display: none; flex-direction: row; gap: 12px; z-index: 500; }
+    .cfg-fab.show { display: flex; }
+    .cfg-fab button {
+      width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .cfg-fab button:hover { transform: translateY(-2px) scale(1.06); }
+    .cfg-fab button:active { transform: scale(0.96); }
+    .cfg-fab .fab-save {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      box-shadow: 0 4px 14px var(--color-primary-shadow);
+    }
+    .cfg-fab .fab-reset {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+    }
+    .st-view .node-tabs { padding: 12px 12px; }
+    .st-view .dock-stat {
+      border-color: var(--color-primary-border);
+      color: var(--color-primary);
+      line-height: 1;
+      font-family: 'Inter Variable', 'Noto Sans SC Variable', 'Source Han Sans SC', '思源黑体', 'PingFang SC', sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+    .st-view .dock-stat b, .st-view .dock-stat i { color: var(--color-primary); }
+    .st-view .dock-speed { color: var(--color-primary); }
+    .st-view .dock-speed:hover { background: var(--color-primary-bg-10); border-color: var(--color-primary-border); }
+    /* 仅未测速的闪电按钮走主题色；延迟胶囊（ ok/mid/warn/fail ）保持原状态色 */
+    .st-view .node-test:not(.ok):not(.mid):not(.warn):not(.fail) { color: var(--color-primary); }
+    .st-view .node-test:not(.ok):not(.mid):not(.warn):not(.fail):hover { background: var(--color-primary-bg-10); }
+    /* 小卡片 hover/active 走主题色（ 覆盖前台固定橙 --primary-40/--primary-70 ） */
+    .st-view .node-card:hover { border-color: var(--color-primary-border); box-shadow: 0 6px 18px var(--color-primary-shadow); }
+    .st-view .node-card:active { border-color: var(--color-primary); box-shadow: 0 0 14px var(--color-primary-shadow); }
+    /* IP 占位：预留 IPv4(12字符)+":"+端口(5字符) 宽度，列宽同步放宽防截断 */
+    .st-view .node-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+    .st-view .node-ip { min-width: 18ch; font-variant-numeric: tabular-nums; }
+    /* 分页按钮激活态走主题色（ 覆盖前台固定橙 ） */
+    .st-view .pagination button.active { background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light)); border-color: transparent; color: #fff; }
+    /* 分页 hover / 跳转框聚焦 / 每页数量下拉 → 主题色（ 对齐 Senflare Proxy 样式 ） */
+    .st-view .pagination button:hover:not(:disabled) { color: var(--color-primary); border-color: var(--color-primary-border); background: var(--color-primary-bg-5); }
+    .st-view .jump-box:focus-within { border-color: var(--color-primary); }
+    .st-view .ms-trigger:hover, .st-view .ms.open .ms-trigger { border-color: var(--color-primary); }
+    /* ms 下拉选项（全局唯一来源，各视图共用）：hover 淡主题底；激活项 bg-15 + 主色字 */
+    .ms-opt.single:hover { background: var(--color-primary-bg-10); }
+    .ms-opt.single.active { background: var(--color-primary-bg-15); color: var(--color-primary); }
+    /* 卡片折叠按钮：无外框主题色 chevron（ 覆盖 SenflareUI 默认 −/+ 文本样式 ） */
+    .card-toggle-btn { color: var(--color-primary); font-size: 0; border: none; background: transparent; }
+    .card-toggle-btn:hover { background: var(--color-primary-bg-10); color: var(--color-primary-light); }
+    .card-toggle-btn svg { display: block; }
+    /* 系统状态栏 D1 指示灯：默认灰（未绑定），绑定后转绿 */
+    .status-bar-indicator { background: var(--text-3, #94a3b8); }
+    .status-bar-indicator.ok { background: var(--color-success, #22c55e); }
+    /* 工具类补定义（标记与日志动态行共用） */
+    .text-muted { color: var(--text-4, #999); }
+    .text-muted-light { color: var(--text-4, #999); }
+    /* 今日配额进度条填充（SenflareUI.css 只有旧 segment 规则，fill 类缺失导致条不可见） */
+    .usage-progress-fill {
+      height: 100%; border-radius: 5px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* 关于我们：区块标题 = 主题色竖线 + 正文色标题 */
+    #view-about .about-h2 {
+      position: relative; margin: 0; padding-left: 14px;
+      font-size: 1.05rem; font-weight: 800; line-height: 1.35; color: var(--text-1);
+    }
+    /* 正文中的品牌名 / 关键词渐变突出（与 .card-title 同款主题渐变） */
+    #view-about .grad-text {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      font-weight: 800;
+    }
+    #view-about .about-h2::before {
+      content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+      width: 4px; height: 18px; border-radius: 2px;
+      background: linear-gradient(180deg, var(--color-primary), var(--color-primary-light));
+      box-shadow: 0 0 8px var(--color-primary-shadow);
+    }
+    #view-about .about-h2 .en {
+      margin-left: 8px; font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px;
+      color: var(--text-4); vertical-align: 1px;
+      font-family: 'Inter Variable', 'Noto Sans SC Variable', sans-serif;
+    }
+    #view-about .about-hr { border: none; border-top: 1px dashed var(--border-2); margin: 14px 0 16px; }
+    /* 特别鸣谢：两列卡片，图标 + 名称链接 + 一句话说明 */
+    #view-about .about-thanks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    #view-about .about-thanks-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: var(--bg-1); border: 1px solid var(--border-1); border-radius: 12px;
+      padding: 14px 16px; transition: all 0.3s;
+    }
+    #view-about .about-thanks-item:hover {
+      border-color: var(--color-primary-border); transform: translateY(-2px);
+      box-shadow: 0 6px 18px var(--color-primary-shadow);
+    }
+    #view-about .about-thanks-icon {
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--color-primary-bg-10); color: var(--color-primary);
+    }
+    #view-about .about-thanks-item a {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.9rem; font-weight: 700; color: var(--text-1); text-decoration: none;
+    }
+    #view-about .about-thanks-item a svg { opacity: 0.45; transition: all 0.2s; }
+    #view-about .about-thanks-item a:hover { color: var(--color-primary); }
+    #view-about .about-thanks-item a:hover svg { opacity: 1; color: var(--color-primary); }
+    #view-about .about-thanks-item p { margin-top: 3px; font-size: 0.78rem; color: var(--text-3); line-height: 1.65; }
+    /* 友情链接：两列整卡链接（ 复用鸣谢卡观感 ） */
+    #view-about .about-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    #view-about .about-links a {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg-1); border: 1px solid var(--border-1); border-radius: 12px;
+      padding: 14px 16px; text-decoration: none; transition: all 0.3s;
+    }
+    #view-about .about-links a:hover {
+      border-color: var(--color-primary-border); transform: translateY(-2px);
+      box-shadow: 0 6px 18px var(--color-primary-shadow);
+    }
+    #view-about .about-links-icon {
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--color-primary-bg-10); color: var(--color-primary);
+    }
+    #view-about .about-links-txt { flex: 1; min-width: 0; }
+    #view-about .about-links-name { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-1); }
+    #view-about .about-links-desc { display: block; margin-top: 2px; font-size: 0.75rem; color: var(--text-3); line-height: 1.5; }
+    #view-about .about-links a svg.arr { margin-left: auto; flex-shrink: 0; color: var(--text-4); transition: all 0.2s; }
+    #view-about .about-links a:hover svg.arr { color: var(--color-primary); }
+    /* 特性 / 声明：主题色圆点列表 */
+    #view-about .about-feats, #view-about .about-declare { list-style: none; margin: 0; padding: 0; }
+    #view-about .about-feats li, #view-about .about-declare li {
+      position: relative; padding: 5px 0 5px 18px;
+      font-size: 0.85rem; color: var(--text-3); line-height: 1.75;
+    }
+    #view-about .about-feats li::before, #view-about .about-declare li::before {
+      content: ''; position: absolute; left: 2px; top: 13px;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    }
+    #view-about .about-feats b, #view-about .about-declare b { color: var(--text-1); }
+    @media (max-width: 700px) {
+      #view-about .about-thanks { grid-template-columns: 1fr; }
+      #view-about .about-links { grid-template-columns: 1fr; }
+    }
+    /* 节点配置页：原生 select 已替换为 ms 下拉，主题色覆盖同款 */
+    #view-nodes .ms-trigger:hover, #view-nodes .ms.open .ms-trigger { border-color: var(--color-primary); }
+    /* 含下拉的卡片不裁剪面板；面板压在后续内容之上 */
+    #view-nodes .nodes-subview .card-body { overflow: visible; }
+    #view-nodes .ms-panel { z-index: 300; }
+    /* 登录壁纸卡：原生 select 下拉不被 .card-body 的 overflow-x:auto 裁断（对齐 #view-nodes 的做法） */
+    #view-advanced .card:has(.setting-select) .card-body { overflow: visible; }
+    /* 日志页下拉向下展开（与节点配置同款）：#view-logs 曾被 overflow-x:hidden 连带垂直裁剪，恢复 visible 后行为一致 */
+    #view-logs { overflow: visible; }
+    #view-logs .ms-panel { z-index: 300; }
+    .card.ms-open-card { position: relative; z-index: 60; }
+    #view-nodes .ms.dropup .ms-panel, #view-logs .ms.dropup .ms-panel { top: auto; bottom: calc(100% + 6px); }
+    /* 行内模式下拉：保证文本 + caret 完整展示 */
+    select[data-cfg="IPMode"] + .ms,
+    select[data-cfg="ProxyIPMode"] + .ms { min-width: 132px; }
+    /* 顶栏左侧：移动端菜单按钮 + 移动品牌 */
+    .header-left { display: flex; align-items: center; gap: 24px; flex: 1; min-width: 0; }
+    .mobile-menu-btn { display: none; font-size: 1.4rem; cursor: pointer; padding: 8px; color: var(--text-3); border-radius: 8px; transition: all .2s; }
+    .mobile-menu-btn:hover { color: var(--color-primary); background: var(--color-primary-bg-10); }
+    .mobile-brand { display: none; }
+    @media (max-width: 768px) {
+      .header-left { gap: 8px; }
+      .mobile-menu-btn { display: flex; align-items: center; justify-content: center; }
+      .mobile-brand { display: flex; align-items: baseline; gap: 2px; font-size: 1.1rem; font-weight: 700; }
+      .mobile-brand .logo-senflare { color: var(--text-1); }
+      .mobile-brand .logo-link { color: var(--color-primary); }
+    }
+    /* 品牌文字：折叠隐藏/展开显示由 SenflareUI 控制；此处补展开态的双色排版 */
+    .sidebar.expanded .logo-text { display: flex; align-items: center; gap: 6px; }
+    /* 展开态：头像与用户名之间恢复间距（原为内联 gap，折叠态仍保持 0） */
+    .sidebar.expanded .user-info { gap: 10px; }
+    /* 底部按钮：固定方形尺寸，折叠/展开两态渲染一致（覆盖前台固定 --bg-secondary/--primary-color） */
+    .sidebar .theme-toggle,
+    .sidebar .menu-toggle { width: 36px; height: 36px; padding: 0; flex-shrink: 0; }
+    .sidebar .theme-toggle:hover,
+    .sidebar .menu-toggle:hover { color: var(--color-primary); background: var(--color-primary-bg-10); }
+    .sidebar .footer-right { align-items: center; }
+    /* 折叠态（仅桌面）：导航项变居中方形按钮，只显示图标；用户名一并隐藏 */
+    @media (min-width: 769px) {
+      .sidebar:not(.expanded) .nav-item {
+        width: 44px;
+        margin: 3px auto;
+        padding: 0;
+        border-radius: 12px;
+      }
+      .sidebar:not(.expanded) .nav-text,
+      .sidebar:not(.expanded) .user-details { display: none; }
+      .sidebar:not(.expanded) .user-info { gap: 0; margin-top: 8px; }
+      .sidebar:not(.expanded) .menu-toggle { margin-bottom: 8px; }
+    }
+    /* 节点详情弹窗（配色走主题令牌，明暗自适应） */
+    .st-check-modal {
+      position: fixed; inset: 0; z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .15s;
+    }
+    .st-check-modal.show { opacity: 1; pointer-events: auto; }
+    .st-check-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .4); backdrop-filter: blur(8px) saturate(1.3); }
+    .st-check-box {
+      position: relative; width: min(640px, 92vw); max-height: 80vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      background: var(--modal-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--border-1); border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+      transform: translateY(-10px); transition: transform .15s;
+    }
+    .st-check-modal.show .st-check-box { transform: translateY(0); }
+    .st-check-head { display: flex; align-items: center; gap: 10px; padding: 14px 20px; font-weight: 700; color: var(--text-1); font-size: 1rem; }
+    .st-check-close { margin-left: auto; display: flex; padding: 5px; border: none; border-radius: 8px; background: transparent; color: var(--text-3); cursor: pointer; transition: all .15s; }
+    .st-check-close:hover { color: var(--text-1); background: var(--color-primary-bg-10); }
+    .st-check-body { flex: 1; overflow: auto; padding: 10px 20px 16px; }
+    .st-check-row { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px dashed var(--border-1); font-size: .85rem; }
+    .st-check-row:last-child { border-bottom: none; }
+    .st-check-k { color: var(--text-3); flex-shrink: 0; }
+    .st-check-v { color: var(--text-1); text-align: right; word-break: break-all; }
+    .st-check-actions { display: flex; justify-content: flex-end; gap: 10px; padding: 12px 20px; }
+    .st-check-actions .st-detail-copy,
+    .st-check-actions .st-detail-close {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 34px; padding: 6px 18px; border-radius: 10px;
+      font-size: .86rem; font-weight: 600; cursor: pointer;
+      border: 1px solid transparent; transition: all .2s;
+    }
+    .st-check-actions .st-detail-copy {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      color: #fff; box-shadow: 0 4px 12px var(--color-primary-shadow);
+    }
+    .st-check-actions .st-detail-copy:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .st-check-actions .st-detail-copy:active { transform: scale(.97); }
+    .st-check-actions .st-detail-close {
+      background: transparent; color: var(--text-2);
+      border-color: var(--border-2);
+    }
+    .st-check-actions .st-detail-close:hover { background: var(--color-primary-bg-10); color: var(--color-primary); }
+    .st-check-actions .st-confirm-ok { box-shadow: 0 4px 12px var(--color-primary-shadow); }
+    .st-check-actions .st-confirm-ok:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .st-check-actions .st-confirm-cancel:hover { background: var(--color-primary-bg-10); }
+    .st-check-actions .st-confirm-ok.danger { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 12px rgba(239,68,68,.35); }
+    .st-check-actions .st-confirm-ok.danger:hover { filter: brightness(1.08); }
+    /* ===== 网络检测 ===== */
+    .latency-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    @media (max-width: 768px) { .latency-cards { grid-template-columns: repeat(2, 1fr); } }
+    .latency-card {
+      background: var(--card-bg); border-radius: 12px; padding: 1rem;
+      border: 1px solid var(--border-1); transition: all 0.3s;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .latency-card:hover {
+      box-shadow: 0 8px 24px var(--color-primary-bg-10);
+      transform: translateY(-2px); border-color: var(--color-primary);
+    }
+    .latency-card-title { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .latency-card-icon { width: 20px; height: 20px; flex-shrink: 0; }
+    .latency-card-icon svg { width: 100%; height: 100%; }
+    .latency-card-name { font-size: 0.85rem; font-weight: 600; color: var(--text-1); }
+    .latency-value { margin-left: auto; font-size: 0.75rem; font-weight: 600; }
+    .latency-card-region { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+    .latency-card-region-domestic { background: var(--color-danger-bg-10); color: var(--color-danger); }
+    .latency-card-region-international { background: var(--color-info-bg-10); color: var(--color-info); }
+    .latency-card-content { margin-top: 1rem; }
+    .latency-bars { display: flex; gap: 3px; height: 6px; align-items: flex-end; }
+    .latency-bar { flex: 1; height: 100%; border-radius: 2px; background: var(--border-1); transition: background-color 0.3s; }
+    .latency-bar.loading { animation: latencyPulse 1s ease-in-out infinite; background: var(--color-warning-bg-40); }
+    @keyframes latencyPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+    /* IP 详情弹窗：外壳复用 .modal（同测速设置弹窗），此处仅保留内容区排版 */
+    .ip-detail-section { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-1); }
+    .ip-detail-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .ip-detail-section-title { font-size: 0.95rem; font-weight: 600; color: var(--text-1); margin-bottom: 12px; }
+    .ip-detail-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; gap: 12px; }
+    .ip-detail-label { font-size: 0.85rem; color: var(--text-3); flex-shrink: 0; min-width: 110px; }
+    .ip-detail-value { font-size: 0.85rem; color: var(--text-1); text-align: right; word-break: break-all; }
+    .ip-detail-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 500; }
+    .badge-info { background: var(--color-info-bg-15); color: var(--color-info); }
+    .badge-verylow { background: var(--color-success-bg-15); color: var(--color-success); }
+    .badge-low { background: var(--color-lime-bg-15); color: var(--color-lime); }
+    .badge-elevated { background: var(--color-amber-bg-15); color: var(--color-yellow); }
+    .badge-high { background: var(--color-primary-bg-15); color: var(--color-primary); }
+    .badge-critical { background: var(--color-danger-bg-20); color: var(--color-rose); }
+    .ip-type-residential { color: var(--color-success); }
+    .ip-type-hosting { color: var(--color-warning); }
+    .ip-type-business { color: var(--color-info); }
+    .ip-type-unknown { color: var(--text-3); }
+    /* 特性卡：4 项按 240px 起分列（宽屏一行 4 / 中屏 2+2 / 窄屏单列，无孤行），图标改 svg 后需显式着色与居中 */

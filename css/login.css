@@ -1,0 +1,216 @@
+/* ==================== Login 页面专属样式（改动后同步 bump HTML 引用的 ?v=）==================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter Variable', 'Noto Sans SC Variable', 'Source Han Sans SC', '思源黑体', 'PingFang SC', sans-serif;
+            min-height: 100vh;
+        }
+        .login-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            background: #12141f center/cover no-repeat;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 左上角品牌标识 */
+        .brand-header {
+            position: absolute;
+            top: 4rem;
+            left: 4rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            z-index: 10;
+        }
+        .brand-logo { display: flex; align-items: center; }
+        .brand-logo img { filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1)); }
+        .brand-text { display: flex; flex-direction: column; justify-content: center; }
+        .brand-text h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin: 0;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        /* Lite 角标：与 index 头部 .brand-lite 同款（css/index.css） */
+        .brand-lite {
+            display: inline-block;
+            vertical-align: 8px;
+            margin-left: 5px;
+            padding: 1px 5px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            color: #fff;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .3px;
+            line-height: 1.5;
+        }
+        .brand-text p {
+            font-size: 0.85rem;
+            color: var(--color-primary);
+            margin: 0.3rem 0 0 0;
+            line-height: 1.2;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 登录区域 */
+        .login-section {
+            width: 100%;
+            max-width: 480px;
+            margin-right: 8%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        .login-box {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 380px;
+            padding: 2.5rem;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.50);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+        }
+        .login-box h1 {
+            font-size: 1.6rem;
+            color: var(--color-primary);
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        /* 表单组间距（sf-login.css 覆盖项） */
+        .login-box .form-group { margin-bottom: 1.5rem; }
+        .login-box .form-group:last-of-type { margin-bottom: 0; }
+        /* 记住密码行：贴近按钮，弱化与上方密码框的间隔层级 */
+        .login-box .form-group.remember-row { margin-bottom: -0.6rem; }
+        .login-box .remember-row + .btn { margin-top: 1.25rem; }   /* 平衡上下间距 */
+        .remember-row .checkbox-label { font-size: 0.85rem; color: var(--text-2); line-height: 18px; }
+        /* 对勾几何居中已上收到 SenflareUI 唯一定义；此处仅保留字体度量微调 */
+        .login-box .remember-row .checkmark {
+            transform: translateY(calc(-50% - 0.5px));
+        }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-icon {
+            position: absolute;
+            left: 1.2rem;
+            width: 20px;
+            height: 20px;
+            color: var(--text-3);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .login-box .form-group input {
+            width: 100%;
+            height: 40px;
+            padding: 0 1rem 0 3.2rem;
+            background: var(--card-bg, #fff);
+            border: 1px solid var(--border-1);
+            border-radius: 50px;
+            color: var(--text-1);
+            font-size: 1rem;
+            line-height: 38px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        .login-box .form-group input::placeholder { color: var(--text-3); }
+        .login-box .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-bg-10);
+        }
+        .input-wrapper:focus-within .input-icon { color: var(--color-primary); }
+
+        /* 登录按钮（主题渐变，覆盖 SenflareUI 通用 .btn 底色） */
+        .login-box .btn {
+            width: 100%;
+            height: 40px;
+            padding: 0 1rem;
+            margin-top: 2rem;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            border: none;
+            color: #fff;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px var(--color-primary-shadow);
+            box-sizing: border-box;
+        }
+        /* hover 与通用 .btn-primary 一致（css/SenflareUI.css） */
+        .login-box .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--color-primary-shadow);
+        }
+        .login-box .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* 访客登录入口：分隔线 + 次级按钮 + 返回链接（管理员/访客两种模式切换） */
+        .login-box .guest-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 1.3rem;
+            color: var(--text-3);
+            font-size: 0.78rem;
+        }
+        .login-box .guest-divider::before,
+        .login-box .guest-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-1); }
+        .login-box .btn.btn-guest {
+            margin-top: 1.1rem;
+            background: rgba(255, 255, 255, 0.65);
+            color: var(--text-1);
+            border: 1px solid var(--border-1);
+            box-shadow: none;
+        }
+        .login-box .btn.btn-guest:hover {
+            filter: none;
+            background: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        /* 暗色主题：登录页会跟随 localStorage 的 data-theme 进入暗色（theme.js 对所有页面生效），
+           玻璃盒固定为浅色，切换按钮改用「深色芯片 + 浅色文字」（与输入框同款体系），避免白底白字 */
+        [data-theme="dark"] .login-box .btn.btn-guest {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-1);
+        }
+        [data-theme="dark"] .login-box .btn.btn-guest:hover {
+            background: rgba(255, 255, 255, 0.16);
+            filter: none;
+        }
+
+        /* 壁纸轮播层：交叉淡入 + 激活期间缓慢放大（对齐 Firefly banner 的 effect-zoom 观感）。
+           首帧由下方 HTML 静态渲染第 1 张；其余由 js/login-ui.js 接管 */
+        .bg-slides { position: absolute; inset: 0; overflow: hidden; }
+        .bg-slide {
+            position: absolute;
+            inset: 0;
+            background: center / cover no-repeat;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+        }
+        .bg-slide.active { opacity: 1; }
+
+        /* 断点与页面布局 lg 对齐：≥1024px 用横版，窄屏用竖版（图源见 js/login-ui.js） */
+        @media (min-width: 1024px) { .only-mobile { display: none; } }
+        @media (max-width: 1023.98px) { .only-desktop { display: none; } }
+
+        @media (max-width: 768px) {
+            .login-container { justify-content: center; }
+            .login-section { margin-right: 0; }
+            .brand-header { top: 1.5rem; left: 1.5rem; }
+        }

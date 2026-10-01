@@ -1,0 +1,197 @@
+/* ============================================================
+ * Senflare Warp — 主题调色盘样式（自 SenflareUI.css 拆出）
+ * 依赖：SenflareUI.css 的 :root 令牌与 .modal 弹窗外壳；
+ *       JS 行为见 js/theme.js（openThemeModal / initColorPicker）。
+ * 引用页：index.html（头部主题图标弹窗）/ login.html / admin.html
+ * 改动本文件请同步 bump 三处引用的 ?v= 版本号。
+ * ============================================================ */
+
+.theme-modal {
+    max-width: 400px;
+}
+
+.color-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 全站主题卡片：右侧颜色控件（色块 + 点击打开调色盘显示当前颜色代码） */
+.setting-theme-color {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+.color-dot {
+    width: 52px;
+    height: 36px;
+    border-radius: 8px;
+    padding: 0;
+    border: 1px solid var(--border-2);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s;
+}
+.color-dot:hover { transform: scale(1.05); }
+.color-dot span {
+    display: block;
+    width: 44px;
+    height: 28px;
+    border-radius: 5px;
+}
+
+/* 登录壁纸卡片：右侧下拉 */
+.setting-select {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+.setting-select select {
+    height: 36px;
+    padding: 0 30px 0 12px;
+    border: 1px solid var(--border-2);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text-1);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* 渐变色板 */
+.color-gradient {
+    width: 100%;
+    height: 200px;
+    border-radius: 8px;
+    position: relative;
+    cursor: crosshair;
+    background: linear-gradient(to bottom, transparent, black),
+                linear-gradient(to right, white, hsl(0, 100%, 50%));
+}
+
+.gradient-cursor {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+/* 控制区 */
+.color-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.color-preview {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--border-1);
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.color-sliders {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.slider-wrapper {
+    position: relative;
+}
+
+/* 色相滑块 */
+.hue-slider {
+    width: 100%;
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(to right,
+        #ff0000 0%, #ffff00 17%, #00ff00 33%,
+        #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+    position: relative;
+    cursor: pointer;
+}
+
+/* 透明度滑块 */
+.alpha-slider {
+    width: 100%;
+    height: 12px;
+    border-radius: 6px;
+    position: relative;
+    cursor: pointer;
+    background: linear-gradient(to right, transparent, var(--color-primary)),
+                repeating-conic-gradient(#ddd 0% 25%, white 0% 50%) 50% / 10px 10px;
+}
+
+.slider-thumb {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border: 2px solid var(--border-1);
+    border-radius: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    pointer-events: none;
+}
+
+/* 颜色输入 */
+.color-input-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.color-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-1);
+    border-radius: 8px;
+    background: var(--bg-2);
+    color: var(--text-1);
+    font-size: 0.95rem;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+}
+
+.color-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--card-bg);
+}
+
+/* 预设颜色 */
+.preset-colors {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 8px;
+}
+
+.preset-color {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.preset-color:hover {
+    border-color: var(--color-primary);
+    transform: scale(1.1);
+}

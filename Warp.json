@@ -1,0 +1,157 @@
+===== CF 原始响应（POST /reg） =====
+{
+    "id": "ec26576a-87f2-453f-83af-e0ddc7b1df41",
+    "type": "a",
+    "model": "PC",
+    "name": "",
+    "key": "OYTlZMolv2N9QadqizC/GKeCVwwrk1Tqq1yQfFZD/IA=",
+    "key_type": "curve25519",
+    "tunnel_type": "wireguard",
+    "account": {
+        "id": "bdb84d5a-ca9a-4381-bcbe-e034565cad52",
+        "account_type": "free",
+        "created": "2026-09-03T16:02:42.215765139Z",
+        "updated": "2026-09-03T16:02:42.215765139Z",
+        "premium_data": 0,
+        "quota": 0,
+        "usage": 0,
+        "warp_plus": true,
+        "referral_count": 0,
+        "referral_renewal_countdown": 0,
+        "role": "child",
+        "license": "01T8w2Rx-gs620n7G-v0GV516m",
+        "ttl": "2026-12-02T16:02:42.215763169Z"
+    },
+    "config": {
+        "client_id": "seAZ",
+        "peers": [
+            {
+                "public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+                "endpoint": {
+                    "v4": "162.159.192.6:0",
+                    "v6": "[2606:4700:d0::a29f:c006]:0",
+                    "host": "engage.cloudflareclient.com:2408",
+                    "ports": [ 2408, 500, 1701, 4500 ]
+                }
+            }
+        ],
+        "interface": {
+            "addresses": {
+                "v4": "172.16.0.2",
+                "v6": "2606:4700:110:8276:b8bf:662:9993:120d"
+            }
+        },
+        "services": {
+            "http_proxy": "172.16.0.1:2480"
+        }
+    },
+    "token": "050d087a-048b-4ff7-bdc8-e842e8335e65",
+    "warp_enabled": false,
+    "waitlist_enabled": false,
+    "created": "2026-09-03T16:02:41.8363184Z",
+    "updated": "2026-09-03T16:02:41.8363184Z",
+    "tos": "2026-09-03T16:02:41.173Z",
+    "place": 0,
+    "locale": "en-US",
+    "enabled": true,
+    "install_id": "",
+    "fcm_token": "",
+    "policy": {
+        "always_include": [
+            {
+                "ip": "162.159.197.4"
+            },
+            {
+                "ip": "2606:4700:102::4"
+            }
+        ],
+        "always_exclude": [
+            {
+                "ip": "162.159.197.3"
+            },
+            {
+                "ip": "2606:4700:102::3"
+            }
+        ],
+        "tunnel_protocol": "masque",
+        "post_quantum": "enabled_with_downgrades"
+    }
+}
+
+===== CF 原始响应（PATCH /reg/{id
+}） =====
+{
+    "id": "ec26576a-87f2-453f-83af-e0ddc7b1df41",
+    "type": "a",
+    "model": "PC",
+    "name": "PC",
+    "key": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7YeqXn4Nc9AAgBtruxDju4BgaKSfBPNies3zE4Ncx/VWcQni3RT6V9djWCZZzqhJfty0BMuwmS83sNqKQbNEOw==",
+    "key_type": "secp256r1",
+    "tunnel_type": "masque",
+    "account": {
+        "id": "bdb84d5a-ca9a-4381-bcbe-e034565cad52",
+        "account_type": "free",
+        "created": "2026-09-03T16:02:42.215765Z",
+        "updated": "2026-09-03T16:02:42.215765Z",
+        "premium_data": 0,
+        "quota": 0,
+        "warp_plus": true,
+        "referral_count": 0,
+        "referral_renewal_countdown": 0,
+        "role": "child",
+        "license": "01T8w2Rx-gs620n7G-v0GV516m"
+    },
+    "config": {
+        "client_id": "Tf1E",
+        "peers": [
+            {
+                "public_key": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG\n7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==\n-----END PUBLIC KEY-----\n",
+                "endpoint": {
+                    "v4": "162.159.198.2:0",
+                    "v6": "[2606:4700:103::2]:0",
+                    "host": "engage.cloudflareclient.com:2408",
+                    "ports": [ 443, 500, 1701, 4500, 4443, 8443, 8095 ]
+                }
+            }
+        ],
+        "interface": {
+            "addresses": {
+                "v4": "172.16.0.2",
+                "v6": "2606:4700:110:8008:2d8a:215:658:6268"
+            }
+        },
+        "services": {
+            "http_proxy": "172.16.0.1:2480"
+        }
+    },
+    "warp_enabled": false,
+    "waitlist_enabled": false,
+    "created": "2026-09-03T16:02:41.836318Z",
+    "updated": "2026-09-03T16:02:43.122275042Z",
+    "tos": "2026-09-03T16:02:41.173Z",
+    "place": 0,
+    "locale": "en-US",
+    "enabled": true,
+    "install_id": "",
+    "fcm_token": "",
+    "policy": {
+        "always_include": [
+            {
+                "ip": "162.159.197.4"
+            },
+            {
+                "ip": "2606:4700:102::4"
+            }
+        ],
+        "always_exclude": [
+            {
+                "ip": "162.159.197.3"
+            },
+            {
+                "ip": "2606:4700:102::3"
+            }
+        ],
+        "tunnel_protocol": "masque",
+        "post_quantum": "enabled_with_downgrades"
+    }
+}
